@@ -590,7 +590,7 @@ MIT License - See LICENSE file for details
 
 ## Contact
 
-For questions or collaboration: [your-email@example.com]
+For questions or collaboration: [wmull21@gmail.com]
 
 ---
 
