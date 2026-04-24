@@ -1,0 +1,25 @@
+{
+  "name": "ai-decision-system",
+  "version": "1.0.0",
+  "description": "AI Decision System with prediction engine, explainability, and dashboard",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@types/pg": "^8.20.0",
+    "pg": "^8.20.0",
+    "redis": "^5.11.0",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "fast-check": "^3.15.0",
+    "ts-node": "^10.9.2",
+    "vitest": "^1.2.2"
+  }
+}

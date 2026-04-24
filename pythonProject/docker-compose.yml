@@ -1,0 +1,146 @@
+services:
+  # PostgreSQL with pgvector extension
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ai-platform-postgres
+    environment:
+      POSTGRES_USER: ai
+      POSTGRES_PASSWORD: ai_secret
+      POSTGRES_DB: ai_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ai -d ai_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for queues and rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: ai-platform-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Project 1: Enterprise AI Copilot
+  enterprise-ai-copilot:
+    build:
+      context: .
+      dockerfile: ./enterprise-ai-copilot/Dockerfile
+    container_name: enterprise-ai-copilot
+    ports:
+      - "4002:4002"
+    environment:
+      - DATABASE_URL=postgresql://ai:ai_secret@postgres:5432/ai_platform
+      - REDIS_URL=redis://redis:6379
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - EMAIL_RECIPIENT=${EMAIL_RECIPIENT}
+      - PORT=4002
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Project 2: AI Planning Agent
+  ai-planning-agent:
+    build:
+      context: .
+      dockerfile: ./ai-planning-agent/Dockerfile
+    container_name: ai-planning-agent
+    ports:
+      - "4003:4003"
+    environment:
+      - DATABASE_URL=postgresql://ai:ai_secret@postgres:5432/ai_platform
+      - REDIS_URL=redis://redis:6379
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - PORT=4003
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Project 3: AI Automation System
+  ai-automation-system:
+    build:
+      context: .
+      dockerfile: ./ai-automation-system/Dockerfile
+    container_name: ai-automation-system
+    ports:
+      - "4001:4001"
+    environment:
+      - DATABASE_URL=postgresql://ai:ai_secret@postgres:5432/ai_platform
+      - REDIS_URL=redis://redis:6379
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - RESEND_API_KEY=${RESEND_API_KEY}
+      - TICKET_WEBHOOK_URL=${TICKET_WEBHOOK_URL}
+      - EMAIL_RECIPIENT=${EMAIL_RECIPIENT}
+      - PORT=4001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Project 4: Multimodal Intelligence App
+  multimodal-intelligence-app:
+    build:
+      context: .
+      dockerfile: ./multimodal-intelligence-app/Dockerfile
+    container_name: multimodal-intelligence-app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://ai:ai_secret@postgres:5432/ai_platform
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - PORT=8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - whisper_models:/root/.cache/whisper
+      - sentence_transformers_models:/root/.cache/torch/sentence_transformers
+
+  # Project 5: AI Decision System
+  ai-decision-system:
+    build:
+      context: .
+      dockerfile: ./ai-decision-system/Dockerfile
+    container_name: ai-decision-system
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://ai:ai_secret@postgres:5432/ai_platform
+      - REDIS_URL=redis://redis:6379
+      - PORT=4000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  whisper_models:
+  sentence_transformers_models:

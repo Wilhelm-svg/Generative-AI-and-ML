@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+yt-dlp
+openai
+hypothesis
+pytest
+python-multipart
+sentence-transformers
+psycopg2-binary
+httpx
+# CPU-only torch (saves ~1.8GB vs GPU build — Whisper works fine on CPU)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+# Install whisper after torch to avoid pulling GPU deps
+openai-whisper

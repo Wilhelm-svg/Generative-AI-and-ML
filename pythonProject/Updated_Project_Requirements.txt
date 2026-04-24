@@ -1,0 +1,318 @@
+MASTER BUILD SPEC — GENERATIVE AI PLATFORM (5 CORE SYSTEMS)
+🎯 Objective
+
+Build a modular, production-grade Generative AI platform consisting of 5 independent but interconnected services:
+
+Enterprise AI Copilot (RAG + Actions)
+AI Planning Agent (Tool-using autonomous agent)
+AI Automation System (Async job processing)
+Multimodal Intelligence App (Audio → Text → QA)
+AI Decision System (ML-based predictions)
+
+All services must:
+
+Be independently deployable
+Share common infrastructure + libraries
+Emit structured telemetry
+Be observable, testable, and extensible
+🧱 GLOBAL ARCHITECTURE REQUIREMENTS
+Tech Stack
+Backend: Node.js (TypeScript 5.x)
+Python: FastAPI (for multimodal service only)
+DB: PostgreSQL (with pgvector)
+Cache/Queue: Redis
+Containerization: Docker + docker-compose
+Testing: Vitest (TS), pytest (Python)
+Shared Libraries (/shared)
+Required modules:
+db.ts
+PostgreSQL connection pool (pg)
+Max connections: 10
+Expose:
+query(sql, params)
+transaction(fn)
+observability.ts
+Middleware wrapper: withObservability(handler)
+Logs to request_logs table:
+latency_ms
+tokens_used
+cost_usd
+status_code
+Cost calculator based on model
+security.ts
+Prompt injection detection (≥7 regex patterns)
+RBAC:
+roles: admin, user, readonly
+Redis sliding-window rate limiter:
+60 req/min per user
+evaluation.ts
+
+Implement RAG evaluation:
+
+groundedness (LLM-as-judge)
+answer relevance
+hallucination detection
+precision@k
+recall@k
+
+Use:
+
+lightweight model (llama-3.1-8b-instant)
+
+Store in:
+
+eval_results
+llmops.ts
+Prompt versioning (PostgreSQL)
+Model routing:
+fast
+balanced
+powerful
+Retry:
+exponential backoff + jitter
+Circuit breaker:
+configurable threshold
+🗄️ CORE DATABASE TABLES
+
+Must include:
+
+request_logs
+prompt_versions
+eval_results
+document_chunks
+user_memory_kv
+jobs
+predictions
+video_sessions
+agent_runs
+security_events
+🚀 PROJECT 1 — ENTERPRISE AI COPILOT
+🎯 Goal
+
+Build a secure, production RAG assistant with actions + memory
+
+Core Features
+1. Authentication
+JWT middleware
+RBAC enforced per endpoint
+2. RAG Pipeline
+Ingestion:
+Accept PDF/TXT
+Chunking strategies:
+fixed
+sentence
+paragraph
+Default:
+512 tokens
+64 overlap
+Storage:
+PostgreSQL + pgvector
+Embedding dimension: 768
+Retrieval:
+Hybrid:
+cosine similarity
+BM25
+RRF reranking
+
+Return:
+
+top 5 chunks
+3. Chat Endpoint
+
+POST /chat
+
+Flow:
+
+Validate auth
+Retrieve relevant chunks
+Build prompt with citations
+Call LLM
+Return answer + sources
+4. Tools
+
+Implement:
+
+send_email
+Use Resend API
+write_db_record
+Persist to JSON or DB
+5. Memory
+Store last 10 interactions per user
+Table: user_memory_kv
+6. Security
+Prompt injection detection
+Content moderation
+Rate limiting
+7. Evaluation
+
+Run after each response:
+
+groundedness
+hallucination detection
+🤖 PROJECT 2 — AI PLANNING AGENT
+🎯 Goal
+
+Multi-step autonomous agent with tool execution
+
+Architecture
+1. Planner
+Input: user task
+Output: JSON steps (2–4 steps)
+2. Executor
+
+For each step:
+
+Validate schema
+Execute tool
+Retry (3 attempts)
+Circuit breaker:
+fail after 5 errors
+3. Tools
+search
+Tavily API
+fallback: DuckDuckGo
+calculator
+Safe evaluator (regex guarded)
+http-api
+Generic fetch tool
+4. Logging
+
+Store in:
+
+agent_runs
+
+Include:
+
+step logs
+errors
+outputs
+⚙️ PROJECT 3 — AI AUTOMATION SYSTEM
+🎯 Goal
+
+Async processing pipeline for business tasks
+
+Architecture
+1. API
+
+POST /jobs
+
+Accept job payload
+Validate input (≤100KB)
+Enqueue to Redis
+2. Worker
+
+Loop:
+
+dequeue job
+process
+timeout: 30s
+3. Pipelines
+InvoiceExtractor
+Extract:
+vendor
+amount
+date
+line items
+EmailClassifier
+classify:
+category
+intent
+auto-reply via Resend
+TicketCategorizer
+classify + route
+webhook trigger
+4. Storage
+PostgreSQL job store
+🎥 PROJECT 4 — MULTIMODAL INTELLIGENCE APP
+🎯 Goal
+
+Process YouTube video → transcript → summary → QA
+
+Tech
+FastAPI (Python)
+Pipeline
+POST /process
+Download audio (yt-dlp)
+Convert via FFmpeg
+Transcribe (Whisper local)
+Summarize (LLM)
+Store in video_sessions
+POST /qa
+Load transcript
+Optional:
+chunking
+embeddings
+Answer with LLM
+Models
+Whisper (local)
+sentence-transformers (local)
+LLM via Groq
+📊 PROJECT 5 — AI DECISION SYSTEM
+🎯 Goal
+
+ML-based prediction engine with explainability
+
+Endpoint
+
+POST /predict
+
+Input:
+
+18 customer fields
+
+Output:
+
+prediction
+confidence
+top 3 features
+recommendation
+Model
+Stacked ensemble:
+XGBoost
+LightGBM
+Random Forest
+Logistic Regression meta-learner
+Training Requirements
+Dataset: Telco churn (~7k rows)
+CV: 5-fold
+HPO: Optuna
+Calibration: Platt scaling
+Threshold optimization (F1)
+Storage
+PostgreSQL predictions table
+🔗 INTEGRATION REQUIREMENTS
+
+All services must:
+
+Emit telemetry to shared DB
+Use shared libraries
+Be containerized
+Expose health endpoints:
+/health
+🧪 TESTING REQUIREMENTS
+Unit tests (Vitest / pytest)
+Property-based tests (fast-check)
+API contract validation
+🐳 DOCKER REQUIREMENTS
+
+Each service must include:
+
+Dockerfile
+ENV-based config
+
+Compose must include:
+
+PostgreSQL (with pgvector)
+Redis
+all services
+🧠 NON-FUNCTIONAL REQUIREMENTS
+All endpoints must validate input strictly
+All errors must be structured JSON
+No silent failures
+Logs must be queryable
+System must degrade gracefully (fallbacks)
+🎯 FINAL INSTRUCTION TO KIRO AI
+
+Build each project as a production-ready microservice, not a prototype.
+Prioritize correctness, observability, and modularity over speed.
+All logic must be testable, debuggable, and extensible.

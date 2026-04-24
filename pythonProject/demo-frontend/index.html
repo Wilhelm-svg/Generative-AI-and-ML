@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generative AI Platform - API Demo</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .service-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .service-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .service-title h2 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .service-title p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .endpoint-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .endpoint-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .endpoint-method {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-right: 12px;
+        }
+
+        .method-get {
+            background: #28a745;
+            color: white;
+        }
+
+        .method-post {
+            background: #007bff;
+            color: white;
+        }
+
+        .endpoint-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .endpoint-url {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            word-break: break-all;
+        }
+
+        .input-section {
+            margin-bottom: 15px;
+        }
+
+        .input-label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .response-section {
+            margin-top: 15px;
+        }
+
+        .response-header {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .response-box {
+            background: #2d2d2d;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .response-box pre {
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        .response-box code {
+            font-family: 'Courier New', monospace;
+        }
+
+        .loading {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success {
+            color: #155724;
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .curl-command {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .service-section {
+                padding: 20px;
+            }
+            
+            .endpoint-card {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const endpoints = [
+            // PROJECT 1: Enterprise AI Copilot (Port 4002)
+            {
+                service: 1,
+                serviceName: "Enterprise AI Copilot",
+                servicePort: 4002,
+                endpoints: [
+                    {
+                        id: 1,
+                        title: "Health Check",
+                        method: "GET",
+                        url: "http://localhost:4002/health",
+                        body: null
+                    },
+                    {
+                        id: 2,
+                        title: "Generate Token",
+                        method: "POST",
+                        url: "http://localhost:4002/token",
+                        body: JSON.stringify({ userId: "test-user", role: "admin" }, null, 2)
+                    },
+                    {
+                        id: 3,
+                        title: "Ingest Document",
+                        method: "POST",
+                        url: "http://localhost:4002/ingest",
+                        headers: { "Authorization": "Bearer YOUR_TOKEN_HERE" },
+                        body: JSON.stringify({ 
+                            text: "Company policy: All employees must submit expense reports by the 5th of each month.", 
+                            fileName: "policy.txt" 
+                        }, null, 2)
+                    },
+                    {
+                        id: 4,
+                        title: "Chat with RAG",
+                        method: "POST",
+                        url: "http://localhost:4002/chat",
+                        headers: { "Authorization": "Bearer YOUR_TOKEN_HERE" },
+                        body: JSON.stringify({ message: "What is the expense report deadline?" }, null, 2)
+                    },
+                    {
+                        id: 5,
+                        title: "Service Status",
+                        method: "GET",
+                        url: "http://localhost:4002/status",
+                        body: null
+                    },
+                    {
+                        id: 6,
+                        title: "Telemetry Data",
+                        method: "GET",
+                        url: "http://localhost:4002/telemetry",
+                        body: null
+                    },
+                    {
+                        id: 7,
+                        title: "Evaluation Results",
+                        method: "GET",
+                        url: "http://localhost:4002/eval",
+                        body: null
+                    }
+                ]
+            },
+            // PROJECT 2: AI Planning Agent (Port 4003)
+            {
+                service: 2,
+                serviceName: "AI Planning Agent",
+                servicePort: 4003,
+                endpoints: [
+                    {
+                        id: 8,
+                        title: "Health Check",
+                        method: "GET",
+                        url: "http://localhost:4003/health",
+                        body: null
+                    },
+                    {
+                        id: 9,
+                        title: "Run Agent Task (Math)",
+                        method: "POST",
+                        url: "http://localhost:4003/run",
+                        body: JSON.stringify({ task: "Calculate 456 * 789" }, null, 2)
+                    },
+                    {
+                        id: 10,
+                        title: "Get Agent Runs",
+                        method: "GET",
+                        url: "http://localhost:4003/runs",
+                        body: null
+                    },
+                    {
+                        id: 11,
+                        title: "Service Status",
+                        method: "GET",
+                        url: "http://localhost:4003/status",
+                        body: null
+                    },
+                    {
+                        id: 12,
+                        title: "Telemetry Data",
+                        method: "GET",
+                        url: "http://localhost:4003/telemetry",
+                        body: null
+                    }
+                ]
+            },
+            // PROJECT 3: AI Automation System (Port 4001)
+            {
+                service: 3,
+                serviceName: "AI Automation System",
+                servicePort: 4001,
+                endpoints: [
+                    {
+                        id: 13,
+                        title: "Health Check",
+                        method: "GET",
+                        url: "http://localhost:4001/health",
+                        body: null
+                    },
+                    {
+                        id: 14,
+                        title: "Create Invoice Extraction Job",
+                        method: "POST",
+                        url: "http://localhost:4001/jobs",
+                        body: JSON.stringify({ 
+                            pipeline_type: "invoice_extraction", 
+                            input_text: "INVOICE #12345\\nDate: 2024-01-15\\n\\nItems:\\n- Dell Laptop x1 @ $1,299.99\\n- Office 365 License x1 @ $99.99\\n- USB-C Hub x1 @ $45.50\\n- Wireless Mouse x1 @ $24.99\\n\\nSubtotal: $1,470.47\\nTax (8.5%): $124.99\\nTotal: $1,595.46"
+                        }, null, 2)
+                    },
+                    {
+                        id: 15,
+                        title: "Create Email Classification Job",
+                        method: "POST",
+                        url: "http://localhost:4001/jobs",
+                        body: JSON.stringify({ 
+                            pipeline_type: "email_classification", 
+                            input_text: "Subject: Urgent - Account Access Issue\\n\\nHi Support Team,\\n\\nI've been trying to log into my account for the past hour but keep getting an error message. This is urgent as I need to access my files for a client meeting in 2 hours. Can someone please help me ASAP?\\n\\nThanks,\\nJohn Smith\\njohn.smith@example.com"
+                        }, null, 2)
+                    },
+                    {
+                        id: 16,
+                        title: "Create Support Ticket Categorization Job",
+                        method: "POST",
+                        url: "http://localhost:4001/jobs",
+                        body: JSON.stringify({ 
+                            pipeline_type: "support_ticket_categorization", 
+                            input_text: "Ticket #12345\\nFrom: customer@example.com\\nSubject: Production database is down\\n\\nOur production database has been completely unresponsive for the last 15 minutes. All customer-facing services are affected. This is causing major revenue loss. We need immediate assistance!"
+                        }, null, 2)
+                    },
+                    {
+                        id: 17,
+                        title: "Get Job Result",
+                        method: "GET",
+                        url: "http://localhost:4001/jobs/YOUR_JOB_ID",
+                        body: null
+                    },
+                    {
+                        id: 18,
+                        title: "List All Jobs",
+                        method: "GET",
+                        url: "http://localhost:4001/jobs",
+                        body: null
+                    },
+                    {
+                        id: 19,
+                        title: "Service Status",
+                        method: "GET",
+                        url: "http://localhost:4001/status",
+                        body: null
+                    },
+                    {
+                        id: 20,
+                        title: "Telemetry Data",
+                        method: "GET",
+                        url: "http://localhost:4001/telemetry",
+                        body: null
+                    }
+                ]
+            },
+            // PROJECT 4: Multimodal Intelligence App (Port 8000)
+            {
+                service: 4,
+                serviceName: "Multimodal Intelligence App",
+                servicePort: 8000,
+                endpoints: [
+                    {
+                        id: 21,
+                        title: "Health Check",
+                        method: "GET",
+                        url: "http://localhost:8000/health",
+                        body: null
+                    },
+                    {
+                        id: 22,
+                        title: "Process Video",
+                        method: "POST",
+                        url: "http://localhost:8000/process",
+                        body: JSON.stringify({ url: "https://www.youtube.com/watch?v=jNQXAC9IVRw" }, null, 2)
+                    },
+                    {
+                        id: 23,
+                        title: "Ask Question",
+                        method: "POST",
+                        url: "http://localhost:8000/qa",
+                        body: JSON.stringify({ 
+                            session_id: "YOUR_SESSION_ID", 
+                            question: "What is this video about?" 
+                        }, null, 2)
+                    },
+                    {
+                        id: 24,
+                        title: "Telemetry Data",
+                        method: "GET",
+                        url: "http://localhost:8000/telemetry",
+                        body: null
+                    }
+                ]
+            },
+            // PROJECT 5: AI Decision System (Port 4000)
+            {
+                service: 5,
+                serviceName: "AI Decision System",
+                servicePort: 4000,
+                endpoints: [
+                    {
+                        id: 25,
+                        title: "API Info",
+                        method: "GET",
+                        url: "http://localhost:4000/",
+                        body: null
+                    },
+                    {
+                        id: 26,
+                        title: "Health Check",
+                        method: "GET",
+                        url: "http://localhost:4000/health",
+                        body: null
+                    },
+                    {
+                        id: 27,
+                        title: "Predict Churn (High Risk)",
+                        method: "POST",
+                        url: "http://localhost:4000/predict",
+                        body: JSON.stringify({ 
+                            fields: {
+                                tenure: 2,
+                                MonthlyCharges: 80.0,
+                                TotalCharges: 160.0,
+                                SeniorCitizen: 0,
+                                Partner: "No",
+                                Dependents: "No",
+                                PhoneService: "Yes",
+                                MultipleLines: "No",
+                                InternetService: "Fiber optic",
+                                OnlineSecurity: "No",
+                                OnlineBackup: "No",
+                                DeviceProtection: "No",
+                                TechSupport: "No",
+                                StreamingTV: "No",
+                                StreamingMovies: "No",
+                                Contract: "Month-to-month",
+                                PaperlessBilling: "Yes",
+                                PaymentMethod: "Electronic check"
+                            }
+                        }, null, 2)
+                    },
+                    {
+                        id: 28,
+                        title: "Predict Retention (Low Risk)",
+                        method: "POST",
+                        url: "http://localhost:4000/predict",
+                        body: JSON.stringify({ 
+                            fields: {
+                                tenure: 60,
+                                MonthlyCharges: 50.0,
+                                TotalCharges: 3000.0,
+                                SeniorCitizen: 0,
+                                Partner: "Yes",
+                                Dependents: "Yes",
+                                PhoneService: "Yes",
+                                MultipleLines: "Yes",
+                                InternetService: "DSL",
+                                OnlineSecurity: "Yes",
+                                OnlineBackup: "Yes",
+                                DeviceProtection: "Yes",
+                                TechSupport: "Yes",
+                                StreamingTV: "Yes",
+                                StreamingMovies: "Yes",
+                                Contract: "Two year",
+                                PaperlessBilling: "No",
+                                PaymentMethod: "Bank transfer (automatic)"
+                            }
+                        }, null, 2)
+                    },
+                    {
+                        id: 29,
+                        title: "Get Prediction by ID",
+                        method: "GET",
+                        url: "http://localhost:4000/predictions/YOUR_PREDICTION_ID",
+                        body: null
+                    },
+                    {
+                        id: 30,
+                        title: "List All Predictions",
+                        method: "GET",
+                        url: "http://localhost:4000/predictions",
+                        body: null
+                    },
+                    {
+                        id: 31,
+                        title: "Filter Predictions (Churn)",
+                        method: "GET",
+                        url: "http://localhost:4000/predictions?label=Churn",
+                        body: null
+                    },
+                    {
+                        id: 32,
+                        title: "Get Insights",
+                        method: "GET",
+                        url: "http://localhost:4000/insights",
+                        body: null
+                    },
+                    {
+                        id: 33,
+                        title: "Telemetry Data",
+                        method: "GET",
+                        url: "http://localhost:4000/telemetry",
+                        body: null
+                    }
+                ]
+            }
+        ];
+
+        function EndpointCard({ endpoint }) {
+            const [body, setBody] = useState(endpoint.body || '');
+            const [url, setUrl] = useState(endpoint.url);
+            const [headers, setHeaders] = useState(JSON.stringify(endpoint.headers || {}, null, 2));
+            const [response, setResponse] = useState(null);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState(null);
+
+            const generateCurl = () => {
+                let curl = `curl -X ${endpoint.method} "${url}"`;
+                
+                if (endpoint.method === 'POST') {
+                    curl += ` -H "Content-Type: application/json"`;
+                    
+                    try {
+                        const parsedHeaders = JSON.parse(headers);
+                        Object.entries(parsedHeaders).forEach(([key, value]) => {
+                            curl += ` -H "${key}: ${value}"`;
+                        });
+                    } catch (e) {}
+                    
+                    if (body) {
+                        const compactBody = JSON.stringify(JSON.parse(body));
+                        curl += ` -d '${compactBody}'`;
+                    }
+                }
+                
+                return curl;
+            };
+
+            const executeRequest = async () => {
+                setLoading(true);
+                setError(null);
+                setResponse(null);
+
+                try {
+                    const options = {
+                        method: endpoint.method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...JSON.parse(headers)
+                        }
+                    };
+
+                    if (endpoint.method === 'POST' && body) {
+                        options.body = body;
+                    }
+
+                    const res = await fetch(url, options);
+                    const data = await res.json();
+                    
+                    setResponse({
+                        status: res.status,
+                        data: data
+                    });
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const resetFields = () => {
+                setBody(endpoint.body || '');
+                setUrl(endpoint.url);
+                setHeaders(JSON.stringify(endpoint.headers || {}, null, 2));
+                setResponse(null);
+                setError(null);
+            };
+
+            useEffect(() => {
+                if (response && response.data) {
+                    Prism.highlightAll();
+                }
+            }, [response]);
+
+            return (
+                <div className="endpoint-card">
+                    <div className="endpoint-header">
+                        <span className={`endpoint-method method-${endpoint.method.toLowerCase()}`}>
+                            {endpoint.method}
+                        </span>
+                        <span className="endpoint-title">{endpoint.title}</span>
+                    </div>
+
+                    <div className="input-section">
+                        <label className="input-label">URL</label>
+                        <input 
+                            type="text" 
+                            className="input-field" 
+                            value={url}
+                            onChange={(e) => setUrl(e.target.value)}
+                            style={{ minHeight: 'auto', height: '40px' }}
+                        />
+                    </div>
+
+                    {endpoint.method === 'POST' && (
+                        <>
+                            <div className="input-section">
+                                <label className="input-label">Headers (JSON)</label>
+                                <textarea 
+                                    className="input-field" 
+                                    value={headers}
+                                    onChange={(e) => setHeaders(e.target.value)}
+                                    style={{ minHeight: '60px' }}
+                                />
+                            </div>
+                            <div className="input-section">
+                                <label className="input-label">Request Body (JSON)</label>
+                                <textarea 
+                                    className="input-field" 
+                                    value={body}
+                                    onChange={(e) => setBody(e.target.value)}
+                                />
+                            </div>
+                        </>
+                    )}
+
+                    <div className="input-section">
+                        <label className="input-label">cURL Command</label>
+                        <pre className="curl-command"><code className="language-bash">{generateCurl()}</code></pre>
+                    </div>
+
+                    <div className="button-group">
+                        <button 
+                            className="btn btn-primary" 
+                            onClick={executeRequest}
+                            disabled={loading}
+                        >
+                            {loading ? 'Running...' : 'Run Request'}
+                        </button>
+                        <button className="btn btn-secondary" onClick={resetFields}>
+                            Reset
+                        </button>
+                    </div>
+
+                    {loading && <div className="loading">Executing request...</div>}
+                    
+                    {error && (
+                        <div className="error">
+                            <strong>Error:</strong> {error}
+                        </div>
+                    )}
+
+                    {response && (
+                        <div className="response-section">
+                            <div className="response-header">
+                                Response (Status: {response.status})
+                            </div>
+                            <div className="response-box">
+                                <pre><code className="language-json">{JSON.stringify(response.data, null, 2)}</code></pre>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function ServiceSection({ service }) {
+            return (
+                <div className="service-section">
+                    <div className="service-header">
+                        <div className="service-number">{service.service}</div>
+                        <div className="service-title">
+                            <h2>{service.serviceName}</h2>
+                            <p>Port {service.servicePort} • {service.endpoints.length} endpoints</p>
+                        </div>
+                    </div>
+                    {service.endpoints.map(endpoint => (
+                        <EndpointCard key={endpoint.id} endpoint={endpoint} />
+                    ))}
+                </div>
+            );
+        }
+
+        function App() {
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>🚀 Generative AI Platform</h1>
+                        <p>Interactive API Demo - All 33 Endpoints</p>
+                    </div>
+                    {endpoints.map(service => (
+                        <ServiceSection key={service.service} service={service} />
+                    ))}
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>

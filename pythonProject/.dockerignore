@@ -1,0 +1,12 @@
+node_modules
+*/node_modules
+**/.git
+**/.kiro
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/dist
+**/.env
+**/build
+**/*.log
+**/.hypothesis
